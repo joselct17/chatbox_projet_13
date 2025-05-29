@@ -1,0 +1,34 @@
+package com.openclassroom.chatbox.configuration;
+
+
+import com.openclassroom.chatbox.model.AppUser;
+import com.openclassroom.chatbox.repository.AppUserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+public class CustomUserDetailsService implements UserDetailsService {
+
+    private final AppUserRepository userRepository;
+
+    public CustomUserDetailsService(AppUserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        AppUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + username));
+        return User.builder()
+                .username(user.getUsername())
+                .password("{noop}" + user.getPassword()) // seulement si non encodé
+                .roles(user.getRole()) // Ex: "USER" ou "SAV"
+                .build();
+    }
+}
+

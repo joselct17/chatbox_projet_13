@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Messagerie</title>
+</head>
+<body>
+<h2>Messagerie - Connecté en tant que <span th:text="${user.username}"></span></h2>
+
+<form method="post" th:action="@{/chat/send}">
+    <select name="toId">
+        <option th:each="u : ${recipients}" th:value="${u.id}" th:text="${u.username}"></option>
+    </select>
+    <input type="text" name="content" placeholder="Votre message">
+    <button type="submit">Envoyer</button>
+</form>
+
+<h3>Historique</h3>
+<ul>
+    <li th:each="m : ${messages}">
+        <span th:text="${#dates.format(m.dateAsDate, 'dd/MM HH:mm')}"></span> -
+        <b th:text="${m.senderUsername == user.username ? 'Moi' : m.senderUsername}"></b> →
+        <b th:text="${m.receiverUsername}"></b> -
+        <span th:text="${m.content}"></span>
+    </li>
+</ul>
+
+</body>
+</html>
